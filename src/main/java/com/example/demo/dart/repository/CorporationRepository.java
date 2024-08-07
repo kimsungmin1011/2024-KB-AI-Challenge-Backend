@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface CorporationRepository extends JpaRepository<Corporation, String> {
     List<Corporation> findByCorpNameContaining(String corpName);
-    Corporation findByCorpName(String corpName);
+    Corporation findFirstByCorpName(String corpName);
 }

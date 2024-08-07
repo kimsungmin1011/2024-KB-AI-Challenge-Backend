@@ -19,7 +19,7 @@ public class CorporationService {
     }
 
     public Corporation findByExactCompanyName(String corpName) {
-        return corporationRepository.findByCorpName(corpName);
+        return corporationRepository.findFirstByCorpName(corpName);
     }
 
     public Corporation findByCompanyCode(String corpCode) {
