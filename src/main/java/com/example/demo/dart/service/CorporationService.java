@@ -14,7 +14,7 @@ public class CorporationService {
     private CorporationRepository corporationRepository;
 
     public List<Corporation> searchCompanyByName(String corpName) {
-        List<Corporation> companies = corporationRepository.findByCorpNameContaining(corpName);
+        List<Corporation> companies = corporationRepository.findByCorpNameContainingOrderByStockCodeDesc(corpName);
         return companies.stream().distinct().collect(Collectors.toList());
     }
 

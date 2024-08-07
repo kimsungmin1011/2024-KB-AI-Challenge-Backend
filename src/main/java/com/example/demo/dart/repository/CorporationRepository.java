@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CorporationRepository extends JpaRepository<Corporation, String> {
-    List<Corporation> findByCorpNameContaining(String corpName);
+    List<Corporation> findByCorpNameContainingOrderByStockCodeDesc(String corpName);
     Corporation findFirstByCorpName(String corpName);
 }
