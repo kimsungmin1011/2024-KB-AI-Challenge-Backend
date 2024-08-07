@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/corporation")
@@ -40,12 +41,11 @@ public class CorporationController {
             @ApiResponse(responseCode = "404", description = "회사를 찾을 수 없음")
     })
     @GetMapping("/financial-data")
-    public String getFinancialData(@RequestParam String companyName) {
-        List<Corporation> companies = corporationService.searchCompanyByName(companyName);
-        if (companies.isEmpty()) {
-            return "회사를 찾을 수 없습니다";
+    public Map<String, Object> getFinancialData(@RequestParam String companyName) {
+        Corporation company = corporationService.findByExactCompanyName(companyName);
+        if (company == null) {
+            return Map.of("message", "회사를 찾을 수 없습니다");
         }
-        Corporation company = companies.get(0); // 첫 번째 결과를 사용
         return externalApiService.getFinancialData(company);
     }
 
@@ -55,10 +55,10 @@ public class CorporationController {
             @ApiResponse(responseCode = "404", description = "회사를 찾을 수 없음")
     })
     @GetMapping("/financial-data/code")
-    public String getFinancialDataByCode(@RequestParam String corpCode) {
+    public Map<String, Object> getFinancialDataByCode(@RequestParam String corpCode) {
         Corporation company = corporationService.findByCompanyCode(corpCode);
         if (company == null) {
-            return "회사를 찾을 수 없습니다";
+            return Map.of("message", "회사를 찾을 수 없습니다");
         }
         return externalApiService.getFinancialData(company);
     }

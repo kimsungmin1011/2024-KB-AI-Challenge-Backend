@@ -18,6 +18,10 @@ public class CorporationService {
         return companies.stream().distinct().collect(Collectors.toList());
     }
 
+    public Corporation findByExactCompanyName(String corpName) {
+        return corporationRepository.findByCorpName(corpName);
+    }
+
     public Corporation findByCompanyCode(String corpCode) {
         return corporationRepository.findById(corpCode).orElse(null);
     }
