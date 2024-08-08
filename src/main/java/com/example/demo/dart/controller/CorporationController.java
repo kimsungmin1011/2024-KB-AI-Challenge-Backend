@@ -71,7 +71,7 @@ public class CorporationController {
             @ApiResponse(responseCode = "200", description = "성공적으로 평가됨"),
             @ApiResponse(responseCode = "404", description = "회사를 찾을 수 없음")
     })
-    @GetMapping("/risk-assessment")
+    @GetMapping("/risk")
     public Map<String, Object> getRiskAssessment(@RequestParam String corpCode) {
         Corporation company = corporationService.findByCompanyCode(corpCode);
         if (company == null) {
