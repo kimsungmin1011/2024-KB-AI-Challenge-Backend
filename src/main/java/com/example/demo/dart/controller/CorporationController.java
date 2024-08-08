@@ -1,5 +1,6 @@
 package com.example.demo.dart.controller;
 
+import com.example.demo.dart.dto.FinancialDataDto;
 import com.example.demo.dart.entity.Corporation;
 import com.example.demo.dart.service.CorporationService;
 import com.example.demo.dart.service.ExternalApiService;
@@ -44,10 +45,10 @@ public class CorporationController {
             @ApiResponse(responseCode = "404", description = "회사를 찾을 수 없음")
     })
     @GetMapping("/financial-data")
-    public Map<String, Object> getFinancialData(@RequestParam String companyName) {
+    public List<FinancialDataDto> getFinancialData(@RequestParam String companyName) {
         Corporation company = corporationService.findByExactCompanyName(companyName);
         if (company == null) {
-            return Map.of("message", "회사를 찾을 수 없습니다");
+            return List.of();
         }
         return externalApiService.getFinancialData(company);
     }
@@ -58,10 +59,10 @@ public class CorporationController {
             @ApiResponse(responseCode = "404", description = "회사를 찾을 수 없음")
     })
     @GetMapping("/financial-data/code")
-    public Map<String, Object> getFinancialDataByCode(@RequestParam String corpCode) {
+    public List<FinancialDataDto> getFinancialDataByCode(@RequestParam String corpCode) {
         Corporation company = corporationService.findByCompanyCode(corpCode);
         if (company == null) {
-            return Map.of("message", "회사를 찾을 수 없습니다");
+            return List.of();
         }
         return externalApiService.getFinancialData(company);
     }
@@ -77,7 +78,7 @@ public class CorporationController {
         if (company == null) {
             return Map.of("message", "회사를 찾을 수 없습니다");
         }
-        Map<String, Object> financialData = externalApiService.getFinancialData(company);
+        List<FinancialDataDto> financialData = externalApiService.getFinancialData(company);
         return chatGptService.analyzeFinancialDataWithChatGPT(financialData);
     }
 }
