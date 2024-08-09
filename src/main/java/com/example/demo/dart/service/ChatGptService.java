@@ -22,25 +22,35 @@ public class ChatGptService {
     private static final String CHATGPT_API_URL = "https://api.openai.com/v1/chat/completions";
 
     public Map<String, Object> analyzeFinancialDataWithChatGPT(List<FinancialDataDto> financialData) {
-        StringBuilder prompt = new StringBuilder("You are a financial expert analyst. Your task is to analyze the company's financial data for multiple fiscal years and quarters provided at the end of this prompt. Based on this data, assess the company's financial health and assign a risk level grade from A to F for each fiscal year, with the corporate risk rating in the first part of the response based on the current 2024 standard. The grading should consider factors such as liquidity, profitability, leverage, efficiency, and relevant market conditions.\n" +
+        StringBuilder prompt = new StringBuilder("You are a financial statement analysis expert specializing in professional risk assessments for companies. Using the provided indicators, compare and analyze the current quarter's data with the same period from the previous year, then assess the company's risk level and assign a grade from A (lowest risk) to F (very high risk).\n" +
                 "\n" +
-                "Output format:\n" +
+                "1. evaluate the company's key financial indicators. \n" +
                 "\n" +
-                "Risk Level Grade: Assign an overall grade (A-F) for the company's risk level, based on the current 2024 standard.\n" +
+                "2. Analyze profitability ratios and liquidity ratios, and compare them with those of the same period last year.\n" +
                 "\n" +
-                "Reasoning: Provide a detailed explanation for the assigned grade. This should include:\n" +
+                "3. Based on these indicators, assess the overall financial soundness and stability of the company.\n" +
                 "\n" +
-                "Liquidity Analysis: Evaluate the company's liquidity using indicators such as the Current Ratio, Quick Ratio, etc.\n" +
-                "Profitability Analysis: Analyze profitability metrics if available, such as ROA, ROE, or Net Profit Margin.\n" +
-                "Leverage Analysis: Assess the company's leverage by examining the Debt Ratio, Financial Leverage, and Interest Coverage Ratio.\n" +
-                "Efficiency Analysis: Analyze the efficiency of the company using ratios such as Inventory Turnover, Accounts Receivable Turnover, etc.\n" +
-                "Market Situation & External Factors: Consider any market conditions or external factors that could affect the company's financial stability.\n" +
-                "Comparative Analysis: Compare the results with the same period from the previous year to identify trends or significant changes.\n" +
-                "Comparative Summary: Summarize how the company’s financial health has changed compared to the previous year(s), noting any improvements, deteriorations, or consistent patterns.\n" +
+                "4. Assign a risk grade from A to F based on your analysis:\n" +
                 "\n" +
-                "Translation: After completing the analysis, translate the entire response into Korean.\n" +
+                "   - A = Very Low Risk\n" +
+                "   - B = Low Risk\n" +
+                "   - C = Medium Risk\n" +
+                "   - D = High Risk\n" +
+                "   - E = Very High Risk\n" +
+                "   - F = Financial Distress\n" +
                 "\n" +
-                "Response Language: Do not return the response in English. Only return the translated version in Korean.\n");
+                "Present the analysis results in the following format:\n" +
+                "\n" +
+                "0. Results are returned in Korean.\n" +
+                "\n" +
+                "1. Present risk rating at the beginning of the response\n" +
+                "\n" +
+                "2. Year-over-Year Analysis:\n" +
+                "Compare the values of each indicator from Year0000 to Year 0000. \n" +
+                "\n" +
+                "3. Risk Grade Evaluation: Assess the risk level from A to F, and explain the rationale behind the grade (based on the indicators) \n" +
+                "\n" +
+                "4. Final Opinion:  Provide an opinion on the overall financial condition and evaluate potential future risk factors for the company.\n");
         for (FinancialDataDto data : financialData) {
             prompt.append("년도: ").append(data.get사업연도()).append(", 분기: ").append(data.get분기()).append("\n");
             for (FinancialDataDto.IndicatorDto indicator : data.get지표목록()) {
