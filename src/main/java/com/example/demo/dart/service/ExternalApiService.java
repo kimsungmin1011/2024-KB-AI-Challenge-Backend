@@ -19,43 +19,45 @@ public class ExternalApiService {
 
     private static final String API_URL = "https://opendart.fss.or.kr/api/fnlttSinglIndx.json";
     private static final String API_KEY = "bd6bf828cd57aad05d2ee4f428224b652ea012bc";
-    private static final String IDX_CL_CODE = "M220000";
 
-    // 보고서 코드를 리스트로 정의 (1분기, 반기, 3분기, 사업)
+    // 1분기, 반기, 3분기, 사업
     private List<String> reprtCodes = List.of("11013", "11012", "11014", "11011");
-    // 검색할 연도를 리스트로 정의
+    // 연도
     private List<String> years = List.of("2022", "2023", "2024");
+    // 수익성지표, 안정성지표
+    private List<String> idxClCodes = List.of("M210000", "M220000");
 
-    // 회사의 재무 데이터를 가져오는 메서드
     public List<FinancialDataDto> getFinancialData(Corporation company) {
         // 모든 결과를 저장할 맵 생성 (중복 방지)
         Map<String, FinancialDataDto> combinedResults = new HashMap<>();
 
-        // 각 연도 및 보고서 코드별로 API 호출
+        // 각 연도 및 분기별로 API 호출
         for (String year : years) {
             for (String reprtCode : reprtCodes) {
-                URI uri = UriComponentsBuilder.fromHttpUrl(API_URL)
-                        .queryParam("crtfc_key", API_KEY)
-                        .queryParam("corp_code", company.getCorpCode())
-                        .queryParam("bsns_year", year)
-                        .queryParam("reprt_code", reprtCode)
-                        .queryParam("idx_cl_code", IDX_CL_CODE)
-                        .build()
-                        .toUri();
+                for (String idxClCode : idxClCodes) {
+                    URI uri = UriComponentsBuilder.fromHttpUrl(API_URL)
+                            .queryParam("crtfc_key", API_KEY)
+                            .queryParam("corp_code", company.getCorpCode())
+                            .queryParam("bsns_year", year)
+                            .queryParam("reprt_code", reprtCode)
+                            .queryParam("idx_cl_code", idxClCode)
+                            .build()
+                            .toUri();
 
-                // API 호출 결과를 맵으로 받음
-                Map<String, Object> result = restTemplate.getForObject(uri, HashMap.class);
-                // 연도와 보고서 코드로 키 생성
-                String key = year + "-" + reprtCode;
-                // 키가 존재하지 않으면 새로운 FinancialDataDto 객체 생성 후 맵에 추가
-                combinedResults.computeIfAbsent(key, k -> {
-                    FinancialDataDto dto = new FinancialDataDto();
-                    dto.set사업연도(year);
-                    dto.set분기(convertReportCode(reprtCode));
-                    return dto;
-                });
-                // 기존 FinancialDataDto 객체에 지표목록 추가
-                combinedResults.get(key).get지표목록().addAll(processResponse(result));
+                    // API 호출 결과를 맵으로 받음
+                    Map<String, Object> result = restTemplate.getForObject(uri, HashMap.class);
+                    // 연도-분기로 키 생성
+                    String key = year + "-" + reprtCode;
+                    // 키가 존재하지 않으면 새로운 FinancialDataDto 객체 생성 후 맵에 추가
+                    combinedResults.computeIfAbsent(key, k -> {
+                        FinancialDataDto dto = new FinancialDataDto();
+                        dto.set사업연도(year);
+                        dto.set분기(convertReportCode(reprtCode));
+                        return dto;
+                    });
+                    // 기존 FinancialDataDto 객체에 지표목록 추가(연도-분기 key로 묶고 뒷부분에 데이터 다는 과정)
+                    combinedResults.get(key).get지표목록().addAll(processResponse(result));
+                }
             }
         }
 
@@ -67,7 +69,7 @@ public class ExternalApiService {
         return sortedResults;
     }
 
-    // API 응답을 지표목록으로 변환하는 메서드
+    // API 응답을 파싱해서 지표목록(IndicatorDto 객체)으로 변환함 (분류명, 지표명, 지표값 추출)
     private List<IndicatorDto> processResponse(Map<String, Object> result) {
         List<IndicatorDto> processedList = new ArrayList<>();
 

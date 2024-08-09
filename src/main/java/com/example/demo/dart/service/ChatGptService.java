@@ -22,7 +22,25 @@ public class ChatGptService {
     private static final String CHATGPT_API_URL = "https://api.openai.com/v1/chat/completions";
 
     public Map<String, Object> analyzeFinancialDataWithChatGPT(List<FinancialDataDto> financialData) {
-        StringBuilder prompt = new StringBuilder("다음 재무 데이터를 전년 동기비(QoQ)로 비교분석하고, A~F 등급으로 회사의 위험 수준을 평가하시오:\n");
+        StringBuilder prompt = new StringBuilder("You are a financial expert analyst. Your task is to analyze the company's financial data for multiple fiscal years and quarters provided at the end of this prompt. Based on this data, assess the company's financial health and assign a risk level grade from A to F for each fiscal year, with the corporate risk rating in the first part of the response based on the current 2024 standard. The grading should consider factors such as liquidity, profitability, leverage, efficiency, and relevant market conditions.\n" +
+                "\n" +
+                "Output format:\n" +
+                "\n" +
+                "Risk Level Grade: Assign an overall grade (A-F) for the company's risk level, based on the current 2024 standard.\n" +
+                "\n" +
+                "Reasoning: Provide a detailed explanation for the assigned grade. This should include:\n" +
+                "\n" +
+                "Liquidity Analysis: Evaluate the company's liquidity using indicators such as the Current Ratio, Quick Ratio, etc.\n" +
+                "Profitability Analysis: Analyze profitability metrics if available, such as ROA, ROE, or Net Profit Margin.\n" +
+                "Leverage Analysis: Assess the company's leverage by examining the Debt Ratio, Financial Leverage, and Interest Coverage Ratio.\n" +
+                "Efficiency Analysis: Analyze the efficiency of the company using ratios such as Inventory Turnover, Accounts Receivable Turnover, etc.\n" +
+                "Market Situation & External Factors: Consider any market conditions or external factors that could affect the company's financial stability.\n" +
+                "Comparative Analysis: Compare the results with the same period from the previous year to identify trends or significant changes.\n" +
+                "Comparative Summary: Summarize how the company’s financial health has changed compared to the previous year(s), noting any improvements, deteriorations, or consistent patterns.\n" +
+                "\n" +
+                "Translation: After completing the analysis, translate the entire response into Korean.\n" +
+                "\n" +
+                "Response Language: Do not return the response in English. Only return the translated version in Korean.\n");
         for (FinancialDataDto data : financialData) {
             prompt.append("년도: ").append(data.get사업연도()).append(", 분기: ").append(data.get분기()).append("\n");
             for (FinancialDataDto.IndicatorDto indicator : data.get지표목록()) {
