@@ -5,6 +5,7 @@ import com.example.demo.dart.entity.Corporation;
 import com.example.demo.dart.service.CorporationService;
 import com.example.demo.dart.service.ExternalApiService;
 import com.example.demo.dart.service.ChatGptService;
+import com.example.demo.dart.service.CompanyInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -21,12 +22,14 @@ public class CorporationController {
     private final CorporationService corporationService;
     private final ExternalApiService externalApiService;
     private final ChatGptService chatGptService;
+    private final CompanyInfoService companyInfoService; // 서비스 필드
 
     @Autowired
-    public CorporationController(CorporationService corporationService, ExternalApiService externalApiService, ChatGptService chatGptService) {
+    public CorporationController(CorporationService corporationService, ExternalApiService externalApiService, ChatGptService chatGptService, CompanyInfoService companyInfoService) {
         this.corporationService = corporationService;
         this.externalApiService = externalApiService;
         this.chatGptService = chatGptService;
+        this.companyInfoService = companyInfoService; // 필드 초기화
     }
 
     @Operation(summary = "회사 이름으로 검색", description = "회사 이름에 포함된 문자열로 회사를 검색합니다.")
@@ -80,5 +83,15 @@ public class CorporationController {
         }
         List<FinancialDataDto> financialData = externalApiService.getFinancialData(company);
         return chatGptService.analyzeFinancialDataWithChatGPT(financialData);
+    }
+
+    @Operation(summary = "회사 코드로 기업 개황 조회", description = "회사 코드로 기업 개황 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회됨"),
+            @ApiResponse(responseCode = "404", description = "회사를 찾을 수 없음")
+    })
+    @GetMapping("/info")
+    public Map<String, Object> getCompanyInfo(@RequestParam String corpCode) {
+        return companyInfoService.getCompanyInfo(corpCode);
     }
 }
