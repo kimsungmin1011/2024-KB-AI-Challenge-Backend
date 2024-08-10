@@ -86,7 +86,7 @@ public class CorporationController {
             return Map.of("message", "회사를 찾을 수 없습니다");
         }
         List<FinancialDataDto> financialData = externalApiService.getFinancialData(company);
-        return chatGptService.analyzeYearOverYear(financialData);
+        return chatGptService.analyzeQuarterOverQuarter(financialData);
     }
 
     @Operation(summary = "회사 코드로 리스크 등급 및 최종 의견 평가", description = "ChatGPT를 사용하여 리스크 등급과 최종 의견을 평가합니다.")
@@ -101,11 +101,7 @@ public class CorporationController {
             return Map.of("message", "회사를 찾을 수 없습니다");
         }
         List<FinancialDataDto> financialData = externalApiService.getFinancialData(company);
-
-        // 주요 사항 데이터 가져오기
         Map<String, Object> majorEvents = majorEventsApiService.getMajorEvents(corpCode);
-
-        // ChatGPT 서비스 호출에 majorEvents 추가
         return chatGptService.analyzeRiskGradeFinalOpinion(financialData, majorEvents);
     }
 

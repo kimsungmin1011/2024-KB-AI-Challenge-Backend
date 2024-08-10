@@ -21,12 +21,16 @@ public class ChatGptService {
     private static final String CHATGPT_API_KEY = "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";
     private static final String CHATGPT_API_URL = "https://api.openai.com/v1/chat/completions";
 
-    public Map<String, Object> analyzeYearOverYear(List<FinancialDataDto> financialData) {
-        StringBuilder prompt = new StringBuilder("You are a financial statement analysis expert specializing in professional risk assessments for companies. Provide a Year-over-Year analysis comparing the company's financial performance across different years. Structure the response as a markdown table. Respond in Korean.\n\n");
-
-        // 표 헤더
-        prompt.append("| 년도 | 분기 | 지표분류명 | 지표명 | 지표값 |\n");
-        prompt.append("| --- | --- | --- | --- | --- |\n");
+    public Map<String, Object> analyzeQuarterOverQuarter(List<FinancialDataDto> financialData) {
+        StringBuilder prompt = new StringBuilder(
+                "You are a financial statement analysis expert specializing in professional risk assessments for companies. Below is the financial data for a company across different quarters. Analyze this data and provide a Quarter-over-Quarter analysis comparing the company's financial performance.\n\n" +
+                        "**Context:** The data includes various financial indicators such as profitability and stability metrics. Use the given data to highlight trends, strengths, or potential risks.\n\n" +
+                        "**Task:** Start with a summary of key findings from a risk assessment perspective, followed by a detailed analysis presented in a markdown table. If the data is missing or cannot be interpreted, clearly state that you cannot provide an answer. Do not create or hallucinate data. If data is insufficient, clearly state in Korean that you cannot provide an answer due to lack of data. Adjust the table headers accordingly if specific quarter data is missing. Respond in Korean and use markdown format.\n\n" +
+                        "**Response format:**\n" +
+                        "1. Summary of key findings (in Korean).\n" +
+                        "2. A markdown table with the analysis.\n\n" +
+                        "Here is the data:\n"
+        );
 
         // 각 재무 데이터를 표 형태로 추가
         for (FinancialDataDto data : financialData) {
@@ -58,7 +62,18 @@ public class ChatGptService {
     }
 
     public Map<String, Object> analyzeRiskGradeFinalOpinion(List<FinancialDataDto> financialData, Map<String, Object> majorEvents) {
-        StringBuilder prompt = new StringBuilder("You are a financial statement analysis expert specializing in professional risk assessments for companies. Based on the provided indicators, assign a risk grade from A (lowest risk) to F (very high risk), and provide a final opinion on the company's financial condition. Start your response with the risk grade in large font. Include the following major events data in your analysis. Respond in Korean and use markdown format.\n\n");
+        StringBuilder prompt = new StringBuilder(
+                "You are a financial statement analysis expert specializing in professional risk assessments for companies. Below is the financial data for a company, including key indicators and major events. Based on this data, assign a risk grade from A (lowest risk) to F (very high risk) and provide a final opinion on the company's financial condition.\n\n" +
+                        "**Context:** The data includes financial indicators such as profitability, stability metrics, and significant events that may impact the company's risk level.\n\n" +
+                        "**Task:**\n" +
+                        "1. Start your response with the risk grade in large font.\n" +
+                        "2. Provide a detailed final opinion on the company's financial condition, considering the major events.\n" +
+                        "3. If any data is missing or cannot be interpreted, clearly state that you cannot provide an answer. Do not create or hallucinate any data. If data is insufficient, clearly state in Korean that you cannot provide an answer due to lack of data.\n\n" +
+                        "**Response format:**\n" +
+                        "1. Risk grade (in large font, in Korean).\n" +
+                        "2. Final opinion (in markdown format, in Korean).\n\n" +
+                        "Here is the data:\n"
+        );
 
         prompt.append("### 주요 사항:\n");
         majorEvents.forEach((key, value) -> {
