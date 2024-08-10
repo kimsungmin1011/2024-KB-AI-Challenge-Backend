@@ -21,31 +21,28 @@ public class ChatGptService {
     private static final String CHATGPT_API_KEY = "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";
     private static final String CHATGPT_API_URL = "https://api.openai.com/v1/chat/completions";
 
-    public Map<String, Object> analyzeRiskGradeWithChatGPT(List<FinancialDataDto> financialData) {
-        StringBuilder prompt = new StringBuilder("You are a financial statement analysis expert specializing in professional risk assessments for companies. Using the provided indicators, evaluate the company's risk level and assign a grade from A (lowest risk) to F (very high risk). Respond in Korean.\n" +
-                "\n" +
-                "1. Evaluate the company's key financial indicators.\n" +
-                "2. Analyze profitability ratios and liquidity ratios, and compare them with those of the same period last year.\n" +
-                "3. Based on these indicators, assess the overall financial soundness and stability of the company.\n" +
-                "4. Assign a risk grade from A to F based on your analysis:\n" +
-                "   - A = Very Low Risk\n" +
-                "   - B = Low Risk\n" +
-                "   - C = Medium Risk\n" +
-                "   - D = High Risk\n" +
-                "   - E = Very High Risk\n" +
-                "   - F = Financial Distress\n" +
-                "Respond in Korean.\n");  // 한국어로 응답 요청 추가
+    public Map<String, Object> analyzeYearOverYear(List<FinancialDataDto> financialData) {
+        StringBuilder prompt = new StringBuilder("You are a financial statement analysis expert specializing in professional risk assessments for companies. Provide a Year-over-Year analysis comparing the company's financial performance across different years. Structure the response as a markdown table. Respond in Korean.\n\n");
+
+        // 표 헤더 추가
+        prompt.append("| 년도 | 분기 | 지표명 | 지표값 |\n");
+        prompt.append("| --- | --- | --- | --- |\n");
+
+        // 각 재무 데이터를 표 형태로 추가
         for (FinancialDataDto data : financialData) {
-            prompt.append("년도: ").append(data.get사업연도()).append(", 분기: ").append(data.get분기()).append("\n");
             for (FinancialDataDto.IndicatorDto indicator : data.get지표목록()) {
-                prompt.append(indicator.toString()).append("\n");
+                prompt.append("| ").append(data.get사업연도())
+                        .append(" | ").append(data.get분기())
+                        .append(" | ").append(indicator.get지표명())
+                        .append(" | ").append(indicator.get지표값())
+                        .append(" |\n");
             }
         }
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "gpt-4o");
         requestBody.put("messages", List.of(Map.of("role", "user", "content", prompt.toString())));
-        requestBody.put("max_tokens", 4096);
+        requestBody.put("max_tokens", 1500); // 간결한 응답 유도
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -56,24 +53,25 @@ public class ChatGptService {
         return restTemplate.postForObject(CHATGPT_API_URL, request, Map.class);
     }
 
-    public Map<String, Object> analyzeFinalOpinionWithChatGPT(List<FinancialDataDto> financialData) {
-        StringBuilder prompt = new StringBuilder("You are a financial statement analysis expert specializing in professional risk assessments for companies. Based on the provided indicators, provide an overall final opinion on the company's financial condition and evaluate potential future risk factors. Respond in Korean.\n" +
-                "\n" +
-                "1. Summarize the key findings from the financial indicators.\n" +
-                "2. Provide your final opinion on the overall financial condition.\n" +
-                "3. Evaluate potential future risk factors for the company.\n" +
-                "Respond in Korean.\n");  // 한국어로 응답 요청 추가
+    public Map<String, Object> analyzeRiskGradeFinalOpinion(List<FinancialDataDto> financialData, Map<String, Object> majorEvents) {
+        StringBuilder prompt = new StringBuilder("You are a financial statement analysis expert specializing in professional risk assessments for companies. Based on the provided indicators, assign a risk grade from A (lowest risk) to F (very high risk), and provide a final opinion on the company's financial condition. Start your response with the risk grade in large font. Include the following major events data in your analysis. Respond in Korean and use markdown format.\n\n");
+
+        prompt.append("### 주요 사항:\n");
+        majorEvents.forEach((key, value) -> {
+            prompt.append("- ").append(key).append(": ").append(value.toString()).append("\n");
+        });
+
         for (FinancialDataDto data : financialData) {
             prompt.append("년도: ").append(data.get사업연도()).append(", 분기: ").append(data.get분기()).append("\n");
             for (FinancialDataDto.IndicatorDto indicator : data.get지표목록()) {
-                prompt.append(indicator.toString()).append("\n");
+                prompt.append("- ").append(indicator.get지표명()).append(": ").append(indicator.get지표값()).append("\n");
             }
         }
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "gpt-4o");
         requestBody.put("messages", List.of(Map.of("role", "user", "content", prompt.toString())));
-        requestBody.put("max_tokens", 4096);
+        requestBody.put("max_tokens", 4096); // 최대 토큰
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -16,7 +16,7 @@ public class MajorEventsApiService {
     private RestTemplate restTemplate;
 
     private static final String API_KEY = "bd6bf828cd57aad05d2ee4f428224b652ea012bc";
-    private static final String BEGIN_DATE = "20150101";
+    private static final String BEGIN_DATE = "20230101";
     private static final String END_DATE = "20241231";
 
     private static final Map<String, String> API_URLS = new HashMap<>() {{
