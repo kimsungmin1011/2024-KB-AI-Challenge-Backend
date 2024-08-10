@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/corporation")
+@CrossOrigin(origins = {"http://localhost:3000", "https://ziggle.kr"})
 public class CorporationController {
 
     private final CorporationService corporationService;
