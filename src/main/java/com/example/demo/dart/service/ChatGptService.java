@@ -24,15 +24,19 @@ public class ChatGptService {
     public Map<String, Object> analyzeYearOverYear(List<FinancialDataDto> financialData) {
         StringBuilder prompt = new StringBuilder("You are a financial statement analysis expert specializing in professional risk assessments for companies. Provide a Year-over-Year analysis comparing the company's financial performance across different years. Structure the response as a markdown table. Respond in Korean.\n\n");
 
-        // 표 헤더 추가
-        prompt.append("| 년도 | 분기 | 지표명 | 지표값 |\n");
-        prompt.append("| --- | --- | --- | --- |\n");
+        // 표 헤더
+        prompt.append("| 년도 | 분기 | 지표분류명 | 지표명 | 지표값 |\n");
+        prompt.append("| --- | --- | --- | --- | --- |\n");
 
         // 각 재무 데이터를 표 형태로 추가
         for (FinancialDataDto data : financialData) {
+            String year = data.get사업연도() != null ? data.get사업연도() : "";
+            String quarter = data.get분기() != null ? data.get분기() : "";
+
             for (FinancialDataDto.IndicatorDto indicator : data.get지표목록()) {
-                prompt.append("| ").append(data.get사업연도())
-                        .append(" | ").append(data.get분기())
+                prompt.append("| ").append(year)
+                        .append(" | ").append(quarter)
+                        .append(" | ").append(indicator.get지표분류명())
                         .append(" | ").append(indicator.get지표명())
                         .append(" | ").append(indicator.get지표값())
                         .append(" |\n");
@@ -62,7 +66,10 @@ public class ChatGptService {
         });
 
         for (FinancialDataDto data : financialData) {
-            prompt.append("년도: ").append(data.get사업연도()).append(", 분기: ").append(data.get분기()).append("\n");
+            String year = data.get사업연도() != null ? data.get사업연도() : "";
+            String quarter = data.get분기() != null ? data.get분기() : "";
+
+            prompt.append("\n년도: ").append(year).append(", 분기: ").append(quarter).append("\n");
             for (FinancialDataDto.IndicatorDto indicator : data.get지표목록()) {
                 prompt.append("- ").append(indicator.get지표명()).append(": ").append(indicator.get지표값()).append("\n");
             }
