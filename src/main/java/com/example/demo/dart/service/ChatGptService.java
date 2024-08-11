@@ -92,6 +92,7 @@ public class ChatGptService {
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "gpt-4o");
+        requestBody.put("temperature", "1");
         requestBody.put("messages", List.of(Map.of("role", "user", "content", prompt.toString())));
         requestBody.put("max_tokens", 4096); // 최대 토큰
 
