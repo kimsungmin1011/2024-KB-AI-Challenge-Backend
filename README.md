@@ -31,10 +31,10 @@ DART에서 수집한 데이터를 분석하고, GPT 기반 LLM이 재무 상태�
     - 분기별 재무 데이터를 비교 분석
     - 위험 등급을 A~F로 평가
     - 데이터 부족 시 *"데이터가 부족하여 답변을 제공할 수 없습니다."* 출력
-    - **할루시네이션 확률 46% → 4% 감소 (100회 호출 기준)**
+    - **할루시네이션 확률 46% → 2% 감소 (100회 호출 기준)**
 
 <details>
-<summary>📄 예시 프롬프트 보기</summary>
+<summary>📄 프롬프트 보기</summary>
 
 ```
 "You are a financial statement analysis expert specializing in professional risk assessments for companies. "
